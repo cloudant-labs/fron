@@ -30,7 +30,7 @@ A frame is defined as:
 * 2 byte unsigned big-endian frame length
 * 4 byte unsigned big-endian stream id
 * 1 byte message flags
-* Up to 64KiB - 7 bytes of binary data
+* Up to 64KiB - 5 bytes of binary data
 
 There are two flags defined:
 
