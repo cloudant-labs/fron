@@ -10,7 +10,7 @@
 % License for the specific language governing permissions and limitations under
 % the License.
 {application, fron, [
-    {description, "JSON Decoder/Encoder."},
+    {description, "Binary Message Decoder/Encoder."},
     {vsn, "0.0.1"},
     {registered, []},
     {applications, [kernel, stdlib]},

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import json
 import socket
 import struct
 
@@ -8,8 +7,7 @@ import struct
 HOST = "127.0.0.1"
 PORT = 8443
 
-def send_msg(sock, stream_id, msg):
-    msg_bytes = json.dumps(msg)
+def send_msg(sock, stream_id, msg_bytes):
     frames = []
     for i in range(0, len(msg_bytes), 65530):
         frames.append([0, msg_bytes[i:i+65530]])
@@ -55,7 +53,7 @@ def recv_msgs(sock):
         if flags & 2 == 2:
             assert stream_id in streams
             msg_data = streams.pop(stream_id)
-            msg = json.loads("".join(msg_data))
+            msg = "".join(msg_data)
             print "Received: %d : %s" % (stream_id, json.dumps(msg))
             send_msg(sock, stream_id, msg)
 

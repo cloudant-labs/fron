@@ -1,7 +1,7 @@
-fron - Framed JSON over TLS/TCP
+fron - Framed binaries over TLS/TCP
 ===
 
-Fron is a simple protocol for multiplexing JSON messages over TCP.
+Fron is a simple protocol for multiplexing binary messages over TCP.
 
 Protocol Basics
 ---
@@ -11,19 +11,18 @@ TCP semantics). A Fron connection is a 1:1 mapping to an underlying TCP/SSL
 socket. SSL/TCP connection negotiation is left up to the implementation.
 There are no ALPN requirements as part of Fron itself.
 
-Fron sends JSON messages by splitting up JSON into discrete packets that
+Fron sends binary messages by splitting them up into discrete packets that
 can then be multiplexed over a given connection. Fron only guarantees
-that a JSON message will be deconstructed and reconstructed on the remote
+that a binary message will be deconstructed and reconstructed on the remote
 end.
 
 Sending Protocol
 ---
 
-An implementation of a Fron sender does the following to send a JSON message:
+An implementation of a Fron sender does the following to send a binary message:
 
-1. Encode JSON as binary
-2. Split the binary into 1 or more frames
-3. Send each frame to the remote
+1. Split the binary into 1 or more frames
+2. Send each frame to the remote
 
 A frame is defined as:
 
@@ -34,14 +33,13 @@ A frame is defined as:
 
 There are two flags defined:
 
-message_start - bit 0 is set to 1
-message_end - bit 1 is set to 1
+`message_start` - bit 0 is set to 1
+`message_end` - bit 1 is set to 1
 
 In pseudo code this might look like:
 
 ```python
-def send_mesg(sock, stream_id, msg):
-    msg_bytes = json.dumps(msg)
+def send_mesg(sock, stream_id, msg_bytes):
     frames = []
     for i in range(0, len(msg_bytes), 65535-7):
         frames.append([0, msg_bytes[i:i+65535-7]])
@@ -59,11 +57,11 @@ def send_mesg(sock, stream_id, msg):
 Receive Protocol
 ---
 
-A Fron receiver reads frames off the connection to reconstruct JSON
+A Fron receiver reads frames off the connection to reconstruct binary
 messages that can then be handled by the application. This basically means
 that a Fron receiver will have some sort of associative container that
-holds all partially received messages which can then are then combined
-and returned as JSON messages.
+holds all partially received message fragments which are then combined
+and returned as the original binary message.
 
 In pseudo code that might look something like such:
 
@@ -95,7 +93,7 @@ def recv_mesgs(sock):
         if flags & 2 == 2:
             assert stream_id in messages
             msg_data = messages.pop(stream_id)
-            msg = json.loads("".join(msg_data))
+            msg = "".join(msg_data)
             do_something_with_message(msg)
 ```
 
