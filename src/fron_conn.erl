@@ -66,7 +66,7 @@ terminate(_Reason, St) ->
     #{
         socket := Socket
     } = St,
-    fron_sock:close(Socket),
+    fron_socket:close(Socket),
     ok.
 
 
