@@ -56,7 +56,7 @@ new_stream(Connection) ->
     fron_conn:new_stream(Connection).
 
 
-send({fron_stream, Socket, StreamId, _Ref}, Message) ->
+send({fron_stream, Socket, StreamId, _Ref}, Message) when is_binary(Message) ->
     lists:foreach(fun({Flags, Data}) ->
         IoData = [<<StreamId:32/integer-unsigned-big, Flags:8>>, Data],
         fron_socket:send(Socket, IoData)
@@ -74,7 +74,7 @@ recv(Stream, Timeout) ->
 recv({fron_stream, _Socket, _StreamId, Ref}, Timeout, Options) ->
     receive
         {fron_msg, Ref, MsgAcc} ->
-            {ok, jiffy:decode(lists:reverse(MsgAcc), Options)}
+            {ok, iolist_to_binary(lists:reverse(MsgAcc))}
     after Timeout ->
         {error, timeout}
     end.
@@ -82,8 +82,7 @@ recv({fron_stream, _Socket, _StreamId, Ref}, Timeout, Options) ->
 
 
 prepare_packets(Message) ->
-    Bin = iolist_to_binary(jiffy:encode(Message)),
-    Packets1 = split(Bin),
+    Packets1 = split(Message),
     Packets2 = set_message_start(Packets1),
     set_message_end(Packets2).
 
