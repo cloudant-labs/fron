@@ -48,8 +48,18 @@ connect({gen_tcp, Host, Port}, Options) ->
             Else
     end;
 
-connect({ssl, _Host, _Port}, _Options) ->
-    erlang:error({todo, add_ssl_connect});
+connect({ssl, Host, Port}, Options) ->
+    BaseOpts = [
+        {mode, binary},
+        {packet, 2},
+        {active, true}
+    ],
+    case ssl:connect(Host, Port, BaseOpts ++ Options, infinity) of
+        {ok, Socket} ->
+            {ok, {ssl, Socket}};
+        Else ->
+            Else
+    end;
 
 connect({Transport, _, _}, _) ->
     {error, {invalid_transport, Transport}}.
