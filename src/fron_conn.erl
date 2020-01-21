@@ -136,6 +136,9 @@ code_change(_OldVsn, St, _Extra) ->
     {ok, St}.
 
 
+handle_data(St, <<>>) ->
+    {noreply, St};
+
 handle_data(St, Frame) ->
     #{
         messages := Msgs0
